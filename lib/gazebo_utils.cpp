@@ -3,13 +3,12 @@
 constexpr const char *__SWAP_SERVICE_NAME = (const char *)"spawn_entity";
 constexpr const char *__DELETE_SERVICE_NAME = (const char *)"delete_entity";
 constexpr const char *__GET_MODELS_SERVICE_NAME = (const char *)"get_model_list";
-constexpr const uint8_t __REQUEST_DELAY_TIME = 5;
 constexpr const uint8_t __SERVICE_CHECK_DELAY_TIME = 2;
 
 
 
-GazeboUtils::GazeboUtils(std::shared_ptr<rclcpp::Node> node_)
-    : ptr_gazebo_node_(node_)
+GazeboUtils::GazeboUtils(std::string gazebo_client_node_name_)
+    : ptr_gazebo_node_(std::make_shared<rclcpp::Node>(gazebo_client_node_name_))
 {
     ptr_spawn_ = ptr_gazebo_node_->create_client<gazebo_msgs::srv::SpawnEntity>(__SWAP_SERVICE_NAME);
     ptr_delete_ = ptr_gazebo_node_->create_client<gazebo_msgs::srv::DeleteEntity>(__DELETE_SERVICE_NAME);
@@ -31,7 +30,6 @@ bool GazeboUtils::priv__check_entity_exists(const std::string &model_name)
     }
 
     auto getModelListRequestFuture = ptr_get_model_list_->async_send_request(request);
-    auto status = getModelListRequestFuture.wait_for(std::chrono::seconds(__REQUEST_DELAY_TIME));
     // Wait for the result.
     if (rclcpp::spin_until_future_complete(ptr_gazebo_node_, getModelListRequestFuture) == rclcpp::FutureReturnCode::SUCCESS)
     {

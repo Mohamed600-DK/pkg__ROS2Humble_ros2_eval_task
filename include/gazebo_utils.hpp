@@ -22,7 +22,7 @@ private:
 
     bool priv__check_entity_exists(const std::string &model_name);
 public:
-  GazeboUtils(std::shared_ptr<rclcpp::Node> node_);
+  GazeboUtils(std::string gazebo_client_node_name);
 
   bool spawn_model(const std::string &model_name,
                    const std::string &xml,
