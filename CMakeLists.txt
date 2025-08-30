@@ -7,10 +7,11 @@ find_package(rclpy REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 
 # === Create Shared Library ===
 add_library(gazebo_utils SHARED
-  lib/gazebo_utils.cpp
+lib/gazebo_utils.cpp
 )
 
 target_include_directories(gazebo_utils PUBLIC
@@ -18,9 +19,22 @@ target_include_directories(gazebo_utils PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 ament_target_dependencies(gazebo_utils
+rclcpp
+geometry_msgs
+gazebo_msgs
+)
+
+# === Create Spawner Node ===
+add_executable(model_spawner_node 
+    src/main.cpp
+    src/model_spawner.cpp)
+target_link_libraries(model_spawner_node gazebo_utils)
+ament_target_dependencies(model_spawner_node
   rclcpp
   geometry_msgs
   gazebo_msgs
+  ament_index_cpp
+
 )
 # ---------------- Install Python Modules ----------------
 ament_python_install_package(${PROJECT_NAME})
@@ -47,15 +61,17 @@ install(
   
 # ---------------- Install 'gazebo_utils' library and headers ----------------
 install(TARGETS gazebo_utils
-  EXPORT export_gazebo_utils
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+EXPORT export_gazebo_utils
+LIBRARY DESTINATION lib
 )
 
 install(DIRECTORY include/
-  DESTINATION include
+DESTINATION include
 )
+
+# ---------------- Install 'model_spawner_node' ----------------
+install(TARGETS model_spawner_node
+  DESTINATION lib/${PROJECT_NAME})
 # ---------------- Export ----------------
 ament_package()
 

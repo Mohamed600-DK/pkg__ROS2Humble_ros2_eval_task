@@ -22,6 +22,8 @@
   <depend>ament_index_python</depend>
   <depend>geometry_msgs</depend>
   <depend>gazebo_msgs</depend>
+  <depend>ament_index_cpp</depend>
+
   
   <export>
     <build_type>ament_cmake</build_type>
