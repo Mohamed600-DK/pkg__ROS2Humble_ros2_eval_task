@@ -8,6 +8,9 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
 find_package(ament_index_cpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(OpenCV REQUIRED)
 
 # === Create Shared Library ===
 add_library(gazebo_utils SHARED
@@ -27,13 +30,17 @@ gazebo_msgs
 # === Create Spawner Node ===
 add_executable(model_spawner_node 
     src/main.cpp
-    src/model_spawner.cpp)
+    src/model_spawner.cpp
+    src/extend_model_spawner.cpp
+    )
 target_link_libraries(model_spawner_node gazebo_utils)
+
 ament_target_dependencies(model_spawner_node
   rclcpp
-  geometry_msgs
-  gazebo_msgs
   ament_index_cpp
+  sensor_msgs
+  cv_bridge
+  OpenCV
 
 )
 # ---------------- Install Python Modules ----------------
@@ -67,6 +74,10 @@ LIBRARY DESTINATION lib
 
 install(DIRECTORY include/
 DESTINATION include
+)
+# ---------------- Install 'Out_img Directory' ----------------
+install(DIRECTORY out_img/
+  DESTINATION share/${PROJECT_NAME}/out_img
 )
 
 # ---------------- Install 'model_spawner_node' ----------------
