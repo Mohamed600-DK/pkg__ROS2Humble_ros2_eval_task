@@ -27,3 +27,7 @@ colcon build --symlink-install && source install/setup.bash
 ```bash
 ros2 launch ros2_eval_task gazebo.launch.py
 ```
+## solution for  some errors 
+```bash
+exportOpenCV_DIR=/usr/lib/x86_64-linux-gnu/cmake/opencv4
+```
