@@ -10,7 +10,7 @@ find_package(gazebo_msgs REQUIRED)
 
 # === Create Shared Library ===
 add_library(gazebo_utils SHARED
-  src/gazebo_utils.cpp
+  lib/gazebo_utils.cpp
 )
 
 target_include_directories(gazebo_utils PUBLIC
