@@ -21,6 +21,8 @@ private:
 
     void timer_callback();
     double random_range(double min, double max);
+protected:
+    bool model_swapped_ = false;
 public:
     ModelSpawnerNode(std::string node_name,std::string gazebo_client_node_name);
 };

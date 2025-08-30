@@ -71,6 +71,8 @@ void ModelSpawnerNode::timer_callback()
     if (ok)
     {
         last_model_ = model_name;
+        RCLCPP_INFO(this->get_logger(), "Spawned model: %s", model_name.c_str());
+        model_swapped_ = true;
     }
 }
 
