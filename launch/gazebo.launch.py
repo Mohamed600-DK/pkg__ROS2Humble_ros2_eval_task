@@ -32,4 +32,11 @@ def generate_launch_description():
                 output='screen'
             )
 
-    return LaunchDescription([gz, rviz_node])
+    model_spawner = Node(
+        package='ros2_eval_task',
+        executable='model_spawner_node',
+        name='model_spawner_node',
+        output='screen'
+    )
+
+    return LaunchDescription([gz, rviz_node, model_spawner])
