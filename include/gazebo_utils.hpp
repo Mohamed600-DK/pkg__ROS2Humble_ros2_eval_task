@@ -31,13 +31,6 @@ private:
     rclcpp::Client<gazebo_msgs::srv::DeleteEntity>::SharedPtr ptr_delete_;               ///< Client for deleting entities from Gazebo
     rclcpp::Client<gazebo_msgs::srv::GetModelList>::SharedPtr ptr_get_model_list_;       ///< Client for retrieving list of models in Gazebo
 
-    /**
-     * @brief Check if a model with the given name already exists in the simulation
-     * @param model_name The name of the model to check for
-     * @return true if the model exists, false otherwise
-     */
-    bool priv__check_entity_exists(const std::string &model_name);
-
 public:
     /**
      * @brief Constructor for GazeboUtils
@@ -55,9 +48,9 @@ public:
      * @param pose Initial pose (position and orientation) for the spawned model
      * @return true if the model was successfully spawned, false otherwise
      * 
-     * This method will first check if a model with the given name already exists.
-     * If it does, the operation will fail and return false. Otherwise, it will
-     * attempt to spawn the model at the specified pose.
+     * This method will automatically attempt to delete any existing model with the same name
+     * before spawning the new model. This ensures that models can be respawned without
+     * conflicts, making it ideal for dynamic model swapping scenarios.
      */
     bool spawn_model(const std::string &model_name,
                      const std::string &xml,

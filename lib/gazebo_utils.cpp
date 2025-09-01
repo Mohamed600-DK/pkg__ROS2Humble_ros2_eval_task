@@ -25,53 +25,15 @@ GazeboUtils::GazeboUtils(std::string gazebo_client_node_name_)
     ptr_get_model_list_ = ptr_gazebo_node_->create_client<gazebo_msgs::srv::GetModelList>(__GET_MODELS_SERVICE_NAME);
 }
 
-bool GazeboUtils::priv__check_entity_exists(const std::string &model_name)
-{
-    // Create request for getting model list
-    auto request = std::make_shared<gazebo_msgs::srv::GetModelList::Request>();
-
-    // Wait for service to become available
-    while (ptr_get_model_list_ != NULL && !ptr_get_model_list_->wait_for_service(std::chrono::milliseconds(__SERVICE_CHECK_DELAY_TIME*1000)))
-    {
-        if (!rclcpp::ok())
-        {
-            RCLCPP_ERROR(ptr_gazebo_node_->get_logger(), "Interrupted while waiting for the service. Exiting.");
-            return false;
-        }
-        RCLCPP_WARN(ptr_gazebo_node_->get_logger(), "service not available, waiting again...");
-    }
-
-    // Send request and wait for response
-    auto getModelListRequestFuture = ptr_get_model_list_->async_send_request(request);
-    
-    // Check if the request was successful
-    if (rclcpp::spin_until_future_complete(ptr_gazebo_node_, getModelListRequestFuture) == rclcpp::FutureReturnCode::SUCCESS)
-    {
-        // Search for the model name in the returned list
-        for (const auto &name : getModelListRequestFuture.get()->model_names) {
-            if (name == model_name) {
-                return true;
-            }
-        }
-    } else {
-        RCLCPP_ERROR(ptr_gazebo_node_->get_logger(), "Failed to call service get_model_list");
-    }
-    return false;
-}
-
-
-
-
 
 bool GazeboUtils::spawn_model(const std::string &model_name,
                               const std::string &xml,
                               const geometry_msgs::msg::Pose &pose)
 {
-    // Check if model already exists to prevent duplicates
-    if (priv__check_entity_exists(model_name))
+    // Always attempt to delete existing model first to enable respawning
+    if(! this->delete_model(model_name))
     {
-        RCLCPP_WARN(ptr_gazebo_node_->get_logger(), "Entity %s already exists", model_name.c_str());
-        return false;
+        RCLCPP_WARN(ptr_gazebo_node_->get_logger(), "Failed to delete model: %s (may not exist)", model_name.c_str());
     }
     
     // Create spawn request with model parameters
