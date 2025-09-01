@@ -55,7 +55,7 @@ void ExtendModelSpawner::image_callback(const sensor_msgs::msg::Image::SharedPtr
         cv::cvtColor(image,image, CV_BGR2RGB);                              // Convert color space from BGR to RGB
         
         // Generate output filename with model name and sequential ID
-        std::string image_path = ament_index_cpp::get_package_share_directory("ros2_eval_task") + "/out_img/output_image_" + this->current_swapped_model() + "_" + std::to_string(image_id++) + ".png";
+        std::string image_path = ament_index_cpp::get_package_share_directory("ros2_eval_task") + "/out_img/output_image_"  + std::to_string(image_id++) + ".png";
         
         // Save the processed image to disk
         cv::imwrite(image_path, image);
