@@ -40,10 +40,11 @@ private:
      * @brief Timer callback function that handles model swapping logic
      * 
      * This function is called periodically by the timer. It:
-     * 1. Deletes the previously spawned model (if any)
-     * 2. Selects a random model from the available battery models
-     * 3. Generates a random position within the workspace boundaries
-     * 4. Spawns the new model at the calculated position
+     * 1. Selects a random model from the available battery models
+     * 2. Generates a random position within the workspace boundaries
+     * 3. Spawns the new model at the calculated position (deletion is handled automatically)
+     * 
+     * Note: Model deletion is now handled internally by the spawn_model method for cleaner operation.
      */
     void timer_callback();
 

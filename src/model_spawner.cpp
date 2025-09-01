@@ -11,6 +11,8 @@
 #include <fstream>
 #include <sstream>
 #include <memory>
+#include <cstdlib>
+#include <ctime>
 
 // Configuration constants for model spawning behavior
 constexpr  int64_t __TIME_DURATION=5;                          ///< Timer duration in seconds between model swaps
@@ -33,6 +35,7 @@ static const std::vector<std::string> models_list={
                 "battery_energizer",
                 "battery_varita",
                 "lipo_battery"};
+
 
 /**
  * @brief Load a file's contents into a string
@@ -71,6 +74,9 @@ static double random_range(double min, double max)
 
 ModelSpawnerNode::ModelSpawnerNode(std::string node_name,std::string gazebo_client_node_name) : Node(node_name),model_swapped_(false)
 {
+    // Initialize random seed for better randomness
+    srand(time(nullptr));
+    
     // Initialize timer for periodic model swapping (every 5 seconds)
     timer_ = this->create_wall_timer(std::chrono::duration<double>(5.0), std::bind(&ModelSpawnerNode::timer_callback, this));
     
@@ -95,30 +101,20 @@ std::string ModelSpawnerNode::current_swapped_model()
 
 void ModelSpawnerNode::timer_callback()
 {
-    // Step 1: Delete previous model (if any exists)
-    if (!last_model_.empty())
-    {
-        if(! gazebo_client_->delete_model(last_model_))
-        {
-            // If deletion fails, clear the model name and return
-            last_model_.clear();
-            return;
-        }
-    }
-
-    // Step 2: Select a random model from the available battery models
+    // Step 1: Select a random model from the available battery models
     std::string model_name = models_list[rand() % models_list.size()];
 
-    // Step 3: Generate random position within workspace boundaries
+    // Step 2: Generate random position within workspace boundaries
     geometry_msgs::msg::Pose pose;
     pose.position.x = random_range(__POS_X_MIN, __POS_X_MA);
     pose.position.y = random_range(__POS_Y_MIN, __POS_Y_MA);
     pose.position.z = random_range(__POS_Z_MI, __POS_Z_MA);
 
-    // Step 4: Get preloaded model XML content (SDF format)
+    // Step 3: Get preloaded model XML content (SDF format)
     std::string xml = model_files[model_name];
 
-    // Step 5: Attempt to spawn the new model
+    // Step 4: Attempt to spawn the new model (deletion is handled internally)
+    RCLCPP_INFO(this->get_logger(), "Spawning model: %s", model_name.c_str());
     bool ok = gazebo_client_->spawn_model(model_name, xml, pose);
     if (ok)
     {
